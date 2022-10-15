@@ -27,6 +27,10 @@
         box.position.x = 0.5;
         box.position.y = 1;
 
+        const boxMaterial = new BABYLON.StandardMaterial("material", scene);
+        boxMaterial.diffuseColor = BABYLON.Color3.Random();
+        box.material = boxMaterial;
+
         var camera = new BABYLON.UniversalCamera(
           "UniversalCamera",
           new BABYLON.Vector3(0, 0, -10),
@@ -34,13 +38,26 @@
         );
         camera.setTarget(BABYLON.Vector3.Zero());
         camera.attachControl(canvas, true);
+        const light = new BABYLON.HemisphericLight(
+          "light",
+          new BABYLON.Vector3(1, 1, 0)
+        );
 
 
-        const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1, 1, 0));
+        box.actionManager = new BABYLON.ActionManager(scene);
+            box.actionManager.registerAction(
+                new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, 
+                function (evt) {
+                    const sourceBox = evt.meshUnderPointer;
+                    sourceBox.position.x += 0.1;
+                    sourceBox.position.y += 0.1;
 
+                    boxMaterial.diffuseColor = BABYLON.Color3.Random();
+                }));
 
         return scene;
       };
+
       const sceneToRender = createScene();
       engine.runRenderLoop(function () {
         sceneToRender.render();
